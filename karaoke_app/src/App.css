@@ -29,7 +29,7 @@ body {
 }
 
 .navbar {
-  background-color: var(--base-dark);
+  background-color: var(--secondary);
   padding: 16px;
   display: flex;
   align-items: center;
@@ -40,6 +40,7 @@ body {
   width: 100%;
   box-sizing: border-box;
   z-index: 100;
+  box-shadow: 0 2px 8px rgba(28, 37, 24, 0.14);
 }
 
 .logo {
