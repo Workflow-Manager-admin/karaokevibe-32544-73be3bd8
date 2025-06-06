@@ -6,6 +6,12 @@ import Home from './Home';
 import SongList from './SongList';
 import Contact from './Contact';
 
+import SingMode from './SingMode';
+import Recording from './Recording';
+import VoiceFilters from './VoiceFilters';
+import Playback from './Playback';
+import SaveShare from './SaveShare';
+
 /*
  * PUBLIC_INTERFACE: Main Application Container
  * Brand-colored, fixed, persistent navigation bar with links: Home, Song List, Contact.
@@ -74,6 +80,11 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/songs" element={<SongList />} />
+              <Route path="/sing/:songId" element={<SingMode />} />
+              <Route path="/record" element={<Recording />} />
+              <Route path="/filters" element={<VoiceFilters />} />
+              <Route path="/playback" element={<Playback />} />
+              <Route path="/save" element={<SaveShare />} />
               <Route path="/contact" element={<Contact />} />
             </Routes>
           </div>
