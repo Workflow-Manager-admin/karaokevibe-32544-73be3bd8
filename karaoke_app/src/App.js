@@ -2,41 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import './App.css';
 
-// Placeholder page components
-function Home() {
-  return (
-    <div className="hero">
-      <div className="subtitle">Welcome to KaraokeVibe</div>
-      <h1 className="title">SingAlong App</h1>
-      <div className="description">
-        Enjoy singing along with your favorite songs, try voice filters, record your performance, and share the fun!
-      </div>
-      <button className="btn btn-large">Get Started</button>
-    </div>
-  );
-}
-function SongList() {
-  return (
-    <div className="hero">
-      <div className="subtitle">Song List</div>
-      <h1 className="title">Browse Songs</h1>
-      <div className="description">
-        This is where you will see the full karaoke song library.
-      </div>
-    </div>
-  );
-}
-function Contact() {
-  return (
-    <div className="hero">
-      <div className="subtitle">Contact</div>
-      <h1 className="title">Get in Touch</h1>
-      <div className="description">
-        Have feedback or questions? Reach out to the KaraokeVibe team!
-      </div>
-    </div>
-  );
-}
+import Home from './Home';
+import SongList from './SongList';
+import Contact from './Contact';
 
 /*
  * PUBLIC_INTERFACE: Main Application Container
