@@ -4,8 +4,13 @@ import React from "react";
 /**
  * KaraokeVibe - VoiceFilters Stub Component
  * Displays a placeholder UI for the Voice Filters feature.
+ * Adds a button to continue to Playback for demo.
  */
+import { useNavigate } from "react-router-dom";
+
 function VoiceFilters() {
+  const navigate = useNavigate();
+
   return (
     <div className="hero">
       <div className="subtitle">Voice Filters</div>
@@ -17,6 +22,14 @@ function VoiceFilters() {
         <button className="btn" disabled>Echo</button>
         <button className="btn" disabled>Auto-Tune</button>
         <button className="btn" disabled>Robot</button>
+      </div>
+      <div style={{ margin: "2rem 0" }}>
+        <button
+          className="btn btn-large"
+          onClick={() => navigate("/playback")}
+        >
+          Continue to Playback
+        </button>
       </div>
     </div>
   );
