@@ -80,25 +80,29 @@ body {
 }
 
 .subtitle {
-  color: var(--base-light);
+  color: var(--primary);
   font-weight: 500;
   font-size: 1.1rem;
+  letter-spacing: 1px;
 }
 
 .title {
   font-size: 3.5rem;
-  font-weight: 600;
-  line-height: 1.2;
+  font-weight: 700;
+  line-height: 1.17;
   margin: 0;
+  color: var(--text-color);
+  text-shadow: 0 2px 12px rgba(25,20,20,0.22);
 }
 
 .description {
   font-size: 1.1rem;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--text-secondary);
   max-width: 600px;
   margin-bottom: 16px;
 }
+
 
 .btn {
   background-color: var(--base-light);
