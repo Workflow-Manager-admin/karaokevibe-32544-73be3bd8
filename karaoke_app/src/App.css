@@ -105,22 +105,28 @@ body {
 
 
 .btn {
-  background-color: var(--base-light);
-  color: white;
+  background-color: var(--primary);
+  color: #191414;
   border: none;
   border-radius: 4px;
   padding: 10px 20px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background 0.18s, color 0.16s;
+  box-shadow: 0 2px 8px rgba(29,185,84,0.07);
 }
 
-.btn:hover {
-  background-color: #7691ff;
+.btn:hover,
+.btn:focus {
+  background: var(--accent);
+  color: var(--secondary);
+  outline: none;
 }
 
 .btn-large {
-  padding: 12px 24px;
-  font-size: 1.1rem;
+  padding: 14px 32px;
+  font-size: 1.15rem;
+  font-weight: 700;
 }
+
