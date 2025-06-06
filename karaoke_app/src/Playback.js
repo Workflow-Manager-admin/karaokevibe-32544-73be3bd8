@@ -1,106 +1,120 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 /**
  * PUBLIC_INTERFACE
- * KaraokeVibe - Playback Component with Mock Audio Controls and Voice Filter Indication
- * Allows users to play/pause a mock recording, shows selected voice filter,
- * and provides a button to continue to Save & Share. No real audio processing is performed.
- *
- * This version fakes audio playback with a progress bar, a simulated audio element,
- * shows which filter is selected, allows Play/Pause, and disables Save during playback.
- * For accessibility, filter and playback status are clearly indicated.
+ * KaraokeVibe - Playback Component
+ * Plays audio of a mock recording, shows active filter, play/pause controls,
+ * and a visual indicator of the selected filter during playback.
+ * No real audio processing happens in this MVP.
  */
-import { useNavigate } from "react-router-dom";
 
-// Demo mock audio file - in a real app, recording would be provided.
-// Placeholder public domain audio.
+// Demo mock audio file.
 const DEMO_AUDIO_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
 
-// Demo filter options, matching VoiceFilters.js.
+// Demo filter options (in real app, these may come from global or session state).
 const FILTERS = [
   { label: "Echo", value: "echo" },
   { label: "Auto-Tune", value: "autotune" },
   { label: "Robot", value: "robot" },
 ];
-// Default settings, would normally come from context/persisted state.
-// Here, 'echo' and 13s as in the rest of the demo.
-const DEFAULT_FILTER = "echo";
-const DEFAULT_RECORDING_LENGTH = 13; // seconds
+const DEFAULT_FILTER = "echo"; // For demo; would be user-choice.
 
 function Playback() {
   const navigate = useNavigate();
+
+  // Demo: active filter remembered here (replace with state sharable between pages for real).
+  const [selectedFilter] = useState(DEFAULT_FILTER);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioDuration, setAudioDuration] = useState(0);
   const [playhead, setPlayhead] = useState(0);
-  const [selectedFilter, setSelectedFilter] = useState(DEFAULT_FILTER);
 
-  const intervalRef = useRef(null);
+  const audioRef = useRef(null);
 
-  // Simulate playback timer (mocks real audio, as no actual recording).
-  // When play starts, increment timer until max duration.
+  // Sync playhead with <audio> tag's current time and manage audio events.
   useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    function updatePlayhead() {
+      setPlayhead(audio.currentTime);
+    }
+    function setDuration() {
+      setAudioDuration(audio.duration || 13); // fallback to previous demo duration
+    }
+    function handleEnded() {
+      setIsPlaying(false);
+      setPlayhead(audio.duration || 0);
+    }
+
+    audio.addEventListener("timeupdate", updatePlayhead);
+    audio.addEventListener("loadedmetadata", setDuration);
+    audio.addEventListener("ended", handleEnded);
+
+    // Fallback for older browsers
+    setAudioDuration(audio.duration || 13);
+
+    return () => {
+      audio.removeEventListener("timeupdate", updatePlayhead);
+      audio.removeEventListener("loadedmetadata", setDuration);
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, []);
+
+  // Play/pause controls for audio element
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
     if (isPlaying) {
-      // If playhead is already at end, rewind and play from start.
-      if (playhead >= DEFAULT_RECORDING_LENGTH) {
+      // If at end, restart playback
+      if (audio.currentTime >= (audio.duration || 0)) {
+        audio.currentTime = 0;
         setPlayhead(0);
       }
-      intervalRef.current = setInterval(() => {
-        setPlayhead((prev) => {
-          if (prev + 1 >= DEFAULT_RECORDING_LENGTH) {
-            clearInterval(intervalRef.current);
-            setIsPlaying(false);
-            return DEFAULT_RECORDING_LENGTH;
-          }
-          return prev + 1;
-        });
-      }, 1000);
+      audio.play();
     } else {
-      clearInterval(intervalRef.current);
+      audio.pause();
     }
-    // Cleanup on unmount.
-    return () => clearInterval(intervalRef.current);
-    // eslint-disable-next-line
   }, [isPlaying]);
 
-  // When playhead reaches the end, auto-stop playback.
-  useEffect(() => {
-    if (playhead >= DEFAULT_RECORDING_LENGTH && isPlaying) {
-      setIsPlaying(false);
-      clearInterval(intervalRef.current);
-    }
-  }, [playhead, isPlaying]);
-
-  // If the filter was supposed to be selectable here, we'd need to get it from state or props.
-  // For demo, we use echo/default. Show the label clearly.
-  const currentFilterLabel =
-    FILTERS.find((f) => f.value === selectedFilter)?.label || "None";
-
-  // Manual position adjustment (seeking)
+  // Seek bar handler
   function handleSeek(e) {
-    setPlayhead(Number(e.target.value));
+    const val = Number(e.target.value);
+    setPlayhead(val);
+    if (audioRef.current) {
+      audioRef.current.currentTime = val;
+    }
   }
 
-  // Toggle play/pause
+  // Play/Pause toggle
   function handlePlayPause() {
-    // If at end, restart playback from the beginning
-    if (!isPlaying && playhead >= DEFAULT_RECORDING_LENGTH) {
+    const audio = audioRef.current;
+    // If playback has finished, restart from beginning
+    if (!isPlaying && audio && audio.currentTime >= (audio.duration || 0)) {
+      audio.currentTime = 0;
       setPlayhead(0);
     }
     setIsPlaying((prev) => !prev);
   }
 
-  // Format seconds as MM:SS
+  // Utility: format seconds to MM:SS
   function formatTime(secs) {
+    if (isNaN(secs) || secs == null) return "00:00";
     const mm = String(Math.floor(secs / 60)).padStart(2, "0");
-    const ss = String(secs % 60).padStart(2, "0");
+    const ss = String(Math.floor(secs % 60)).padStart(2, "0");
     return `${mm}:${ss}`;
   }
+
+  // Current filter label (visual only)
+  const currentFilterLabel =
+    FILTERS.find((f) => f.value === selectedFilter)?.label || "None";
 
   return (
     <div className="hero">
       <div className="subtitle">Playback</div>
       <h1 className="title">Playback Performance</h1>
       <div className="description" style={{ marginBottom: 12 }}>
-        Listen to your mock recording with your selected voice filter applied!
+        Listen to your recording with your chosen voice filter!
       </div>
       <div
         style={{
@@ -117,7 +131,7 @@ function Playback() {
           gap: 18,
         }}
       >
-        {/* Voice filter indication */}
+        {/* Show current filter visually */}
         <div
           style={{
             fontSize: "1.07em",
@@ -134,11 +148,12 @@ function Playback() {
               fontWeight: 700,
               marginLeft: 4,
             }}
+            aria-label={`Current filter: ${currentFilterLabel}`}
           >
             {currentFilterLabel}
           </span>
         </div>
-        {/* Simulated audio bar and playback controls */}
+        {/* Audio controls */}
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <button
             className="btn btn-large"
@@ -156,11 +171,11 @@ function Playback() {
           >
             {isPlaying ? "Pause" : "Play"}
           </button>
-          {/* Progress Bar */}
           <input
             type="range"
             min={0}
-            max={DEFAULT_RECORDING_LENGTH}
+            max={audioDuration}
+            step={0.1}
             value={playhead}
             onChange={handleSeek}
             disabled={!isPlaying}
@@ -179,7 +194,7 @@ function Playback() {
               textAlign: "center",
             }}
           >
-            {formatTime(playhead)} / {formatTime(DEFAULT_RECORDING_LENGTH)}
+            {formatTime(playhead)} / {formatTime(audioDuration)}
           </span>
         </div>
         <div
@@ -189,7 +204,7 @@ function Playback() {
             opacity: 0.72,
           }}
         >
-          (This is a mock. Actual audio & filter preview will play here!)
+          (Voice filter appearance is for demo only. No live audio FX applied.)
         </div>
       </div>
       <div>
@@ -212,16 +227,18 @@ function Playback() {
           fontSize: "0.95em",
           color: "var(--text-secondary)",
         }}
+        aria-live="polite"
       >
         {isPlaying
           ? `Playing (with filter: ${currentFilterLabel})`
           : ""}
       </div>
-      {/* Visually hidden audio element for mock demo feel */}
+      {/* Audio playback element, visually hidden; controlled only via UI */}
       <audio
-        style={{ display: "none" }}
+        ref={audioRef}
         src={DEMO_AUDIO_URL}
-        controls={false}
+        style={{ display: "none" }}
+        preload="auto"
       />
     </div>
   );
