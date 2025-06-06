@@ -19,7 +19,7 @@ import SaveShare from './SaveShare';
  */
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <div className="app">
         {/* Persistent Top Navigation Bar */}
         <nav className="navbar">
@@ -90,7 +90,7 @@ function App() {
           </div>
         </main>
       </div>
-    </Router>
+    </BrowserRouter>
   );
 }
 
